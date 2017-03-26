@@ -21,8 +21,6 @@ dependencies {
 
 //TODO(oliver): Test using dependecies as submodules? Does this make a difference for proguard?
 
-    compile 'com.google.guava:guava:21.0'
-    
     runtime 'org.eclipse.jdt:org.eclipse.jdt.annotation:2.1.0'
 
     testCompile 'junit:junit:4.12'
