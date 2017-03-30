@@ -95,21 +95,30 @@ public class ZoomPane extends Control {
 
   /** The current zooom value. Default is 1.0. */
   private @Nullable DoubleProperty zoom;
+  /** The default value for uninitialized zoom value. */
+  private static final double DEFAULT_ZOOM_VALUE = 1.0;
 
   /** @param zoom The new zoom value. */
   public void setZoom(final double zoom) {
-    zoomProperty().set(zoom);
+    zoomProperty().set(clamp(getMinimumZoom(), zoom, getMaximumZoom()));
   }
 
   /** @return The current zoom value. */
   public double getZoom() {
-    return zoom != null ? zoom.get() : 1.0;
+    return zoom != null ? zoom.get() : DEFAULT_ZOOM_VALUE;
   }
 
   /** @return The zoom property. */
   public DoubleProperty zoomProperty() {
     if (zoom == null) {
-      zoom = new SimpleDoubleProperty(this, "zoom", 1.0);
+      zoom =
+          new SimpleDoubleProperty(this, "zoom", DEFAULT_ZOOM_VALUE) {
+
+            @Override
+            public void set(final double newValue) {
+              super.set(clamp(getMinimumZoom(), newValue, getMaximumZoom()));
+            }
+          };
     }
     requireNonNull(zoom);
     return zoom;
@@ -117,6 +126,8 @@ public class ZoomPane extends Control {
 
   /** The current mininum allowed value for zoom. Default is 0.0. */
   private @Nullable DoubleProperty minimumZoom;
+  /** The defautl value for uninitalized minimumZoom values. */
+  private static final double DEFAULT_MINIMUM_ZOOM_VALUE = 0.0;
 
   /** @param minimum The minimum allowed zoom value. */
   public void setMinimumZoom(final double minimum) {
@@ -125,13 +136,13 @@ public class ZoomPane extends Control {
 
   /** @return The current minimum allowed zoom value. */
   public double getMinimumZoom() {
-    return minimumZoom != null ? minimumZoom.get() : 0.0;
+    return minimumZoom != null ? minimumZoom.get() : DEFAULT_MINIMUM_ZOOM_VALUE;
   }
 
   /** @return The minimum zoom property. */
   public DoubleProperty minimumZoomProperty() {
     if (minimumZoom == null) {
-      minimumZoom = new SimpleDoubleProperty(this, "minimumZoom", 0.0);
+      minimumZoom = new SimpleDoubleProperty(this, "minimumZoom", DEFAULT_MINIMUM_ZOOM_VALUE);
     }
     requireNonNull(minimumZoom);
     return minimumZoom;
@@ -139,6 +150,8 @@ public class ZoomPane extends Control {
 
   /** The current maximum allowed value for zoom. Default is {@link Double#MAX_VALUE}. */
   private @Nullable DoubleProperty maximumZoom;
+  /** The defautl value for uninitalized maximumZoom values. */
+  private static final double DEFAULT_MAXIMUM_ZOOM_VALUE = Double.MAX_VALUE;
 
   /** @param maximum The maximum allowed zoom value. */
   public void setMaximumZoom(final double maximum) {
@@ -147,15 +160,29 @@ public class ZoomPane extends Control {
 
   /** @return The current maximum allowed zoom value. */
   public double getMaximumZoom() {
-    return maximumZoom != null ? maximumZoom.get() : Double.MAX_VALUE;
+    return maximumZoom != null ? maximumZoom.get() : DEFAULT_MAXIMUM_ZOOM_VALUE;
   }
 
   /** @return The maximum zoom property. */
   public DoubleProperty maximumZoomProperty() {
     if (maximumZoom == null) {
-      maximumZoom = new SimpleDoubleProperty(this, "maximumZoom", Double.MAX_VALUE);
+      maximumZoom = new SimpleDoubleProperty(this, "maximumZoom", DEFAULT_MAXIMUM_ZOOM_VALUE);
     }
     requireNonNull(maximumZoom);
     return maximumZoom;
+  }
+
+  /**
+   * Simple utility function which clamps the given value to be strictly between the min and max
+   * values.
+   */
+  static double clamp(final double min, final double value, final double max) {
+    if (value < min) {
+      return min;
+    }
+    if (value > max) {
+      return max;
+    }
+    return value;
   }
 }
